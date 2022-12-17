@@ -1,6 +1,4 @@
-import 'dart:convert';
-import 'dart:ffi';
-
+import 'dart:convert' show jsonDecode;
 import 'package:energymeter/state/application_state.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 
-import 'HomePage.dart';
+import 'home_page.dart';
 // import 'Home_Page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -34,9 +32,11 @@ class _LoginPageState extends State<LoginPage> {
     if (kDebugMode) {
       print("handleLogin $username:$password");
     }
-    setState(() {
-      isServerResponseGoingOn = true;
-    });
+    if (mounted) {
+      setState(() {
+        isServerResponseGoingOn = true;
+      });
+    }
     Response? response;
     try {
       String url = context.read<ApplicationState>().getUrl();
@@ -49,10 +49,11 @@ class _LoginPageState extends State<LoginPage> {
           'Content-Type': 'application/json; charset=UTF-8',
         },
       );
-
-      setState(() {
-        isServerResponseGoingOn = false;
-      });
+      if (mounted) {
+        setState(() {
+          isServerResponseGoingOn = false;
+        });
+      }
 
       if (response.statusCode != 200) {
         if (kDebugMode) {
@@ -62,47 +63,34 @@ class _LoginPageState extends State<LoginPage> {
       bool? result = false;
       if (response.statusCode >= 200 && response.statusCode < 300) {
         Map<String, dynamic> parameters = jsonDecode(response.body);
-        var cd = parameters.forEach((key, value) {
+        parameters.forEach((key, value) {
           // list.add(value);
           // print("value $value");
           if (value["password"] == password) {
             result = true;
           }
         });
-        // print("parameters1 ${list[0]["password"]}");
         if (result == true) {
-          // EasyLoading.showToast("Successfull", dismissOnTap: true);
-          Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (_) => const HomePage()));
+          if (mounted) {
+            Navigator.pushReplacement(
+                context, MaterialPageRoute(builder: (_) => const HomePage()));
+          }
         }
-        // if (kDebugMode) {
-        //   print("parameters $parameters");
-        // }
-        // ignore: use_build_context_synchronously
-        // EasyLoading.showToast("Successfull", dismissOnTap: true);
       }
       if (result == false) {
         EasyLoading.showToast("Invalid Username or Password",
             dismissOnTap: true);
-        // setState(() {
-        //   passwordIP.text = "";
-        // });
       }
-      // } else {
-      //   EasyLoading.showToast("Unable to Communicate server",
-      //       dismissOnTap: true);
-      // }
     } catch (e) {
       response = null;
       String message = e.toString();
       EasyLoading.showToast(message, dismissOnTap: true);
     }
-
-    setState(() {
-      isServerResponseGoingOn = false;
-    });
-    // print("response ${response.statusCode}");
-    // return null; //response;
+    if (mounted) {
+      setState(() {
+        isServerResponseGoingOn = false;
+      });
+    }
   }
 
   @override
@@ -181,9 +169,7 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.circular(20)),
                     child: TextButton(
                       onPressed: () {
-                        setState(() {
-                          handleLogin(usernameIP.text, passwordIP.text);
-                        });
+                        handleLogin(usernameIP.text, passwordIP.text);
                       },
                       child: const Text(
                         'Login',

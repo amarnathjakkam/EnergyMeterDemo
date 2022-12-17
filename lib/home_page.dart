@@ -1,16 +1,13 @@
-import 'dart:convert';
-
-import 'package:energymeter/MeterLive.dart';
+import 'package:energymeter/meter_live_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:energymeter/login_page.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/cupertino.dart';
 import 'state/application_state.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -55,12 +52,15 @@ class _HomePageState extends State<HomePage> {
         if (response.statusCode >= 200 && response.statusCode < 300) {
           Map<String, dynamic> parameters = jsonDecode(response.body);
           // print('parameters $parameters');
+          if (!mounted) return;
           context.read<ApplicationState>().resetMeterList();
-          var cd = parameters.forEach((key, value) {
+          parameters.forEach((key, value) {
             // print("Key $key value $value");
             context.read<ApplicationState>().addMeterToMeterList(key);
           });
-          print("Meter List ${context.read<ApplicationState>().meterList}");
+          if (kDebugMode) {
+            print("Meter List ${context.read<ApplicationState>().meterList}");
+          }
         }
       } catch (e) {
         String message = e.toString();
@@ -78,8 +78,7 @@ class _HomePageState extends State<HomePage> {
         context,
         MaterialPageRoute(
             builder: (_) => MeterLiveWidget(
-                meter_imei:
-                    context.read<ApplicationState>().meterList[index])));
+                meterImei: context.read<ApplicationState>().meterList[index])));
   }
 
   @override
@@ -132,7 +131,7 @@ class _HomePageState extends State<HomePage> {
                 padding: const EdgeInsets.all(8.0),
                 child: const CircularProgressIndicator())
             : Container(
-                padding: EdgeInsets.all(5),
+                padding: const EdgeInsets.all(5),
                 child: ListView.builder(
                   itemBuilder: _buildMeterItem,
                   itemCount: context.read<ApplicationState>().meterList.length,
@@ -147,10 +146,17 @@ class _HomePageState extends State<HomePage> {
               loadMeterLive(index)
             },
         child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(5.0),
             child: Card(
-              child: Text(
-                  context.read<ApplicationState>().meterList.elementAt(index)),
+              child: ListTile(
+                leading: Icon(Icons.gas_meter,
+                    color: Colors.blue.shade600, size: 45),
+                title: Text(
+                  context.read<ApplicationState>().meterList.elementAt(index),
+                  style: const TextStyle(fontSize: 20),
+                ),
+                subtitle: const Text(''),
+              ),
             )));
   }
 }
