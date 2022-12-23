@@ -49,7 +49,8 @@ class _MeterLiveState extends State<MeterLiveWidget> {
   }
 
   String getParameterValueInRedable(String descrption, String units, String key,
-      dynamic object, List<String>? types) {
+      dynamic object, List<String>? types,
+      {int numberOfDecimals = 1}) {
     String message = "";
     if (object[key] != null) {
       var values = object[key];
@@ -61,13 +62,16 @@ class _MeterLiveState extends State<MeterLiveWidget> {
         if (types != null && types.length == list.length) {
           int ix = 0;
           for (var value in list) {
-            message += "$descrption ${types[ix++]} : $value $units \n";
+            message +=
+                "$descrption ${types[ix++]} : ${value.toStringAsFixed(numberOfDecimals)} $units \n";
           }
         } else {
-          message += "$descrption : ${object[key]} $units \n";
+          message +=
+              "$descrption : ${object[key].toStringAsFixed(numberOfDecimals)} $units \n";
         }
       } else {
-        message += "$descrption : ${object[key]} $units \n";
+        message +=
+            "$descrption : ${object[key].toStringAsFixed(numberOfDecimals)} $units \n";
       }
     }
     return message;
