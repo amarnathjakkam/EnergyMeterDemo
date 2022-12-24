@@ -11,9 +11,12 @@ import 'package:http/http.dart' as http;
 
 //ignore: must_be_immutable
 class MeterLiveWidget extends StatefulWidget {
+  String? meterLocation;
   String? meterImei;
 
-  MeterLiveWidget({Key? key, required this.meterImei}) : super(key: key);
+  MeterLiveWidget(
+      {Key? key, required this.meterImei, required this.meterLocation})
+      : super(key: key);
 
   @override
   State<MeterLiveWidget> createState() => _MeterLiveState();
@@ -102,7 +105,7 @@ class _MeterLiveState extends State<MeterLiveWidget> {
             print('parameters $parameters');
           }
           parameters.forEach((key, value) {
-            message = "";
+            message = "Location: ${widget.meterLocation}\n";
             var timestamp = value['timestamp'];
             if (timestamp > 19800) {
               timestamp -= 19800;
@@ -135,9 +138,9 @@ class _MeterLiveState extends State<MeterLiveWidget> {
             message += "\n";
             message += getParameterValueInRedable(
                 "Active Power", 'Watt', "watts", value, valueTypes);
-            message += "\n";
-            message += getParameterValueInRedable(
-                "Reactive Power", 'VAR', "vars", value, valueTypes);
+            // message += "\n";
+            // message += getParameterValueInRedable(
+            //     "Reactive Power", 'VAR', "vars", value, valueTypes);
 
             // message = "Cumlative WH:  ${value['kwh'].toStringAsFixed(3)} WH\n";
             // message +=

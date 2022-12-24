@@ -4,7 +4,7 @@ import "../model/meter_information.dart";
 /// Mix-in [DiagnosticableTreeMixin] to have access to [debugFillProperties] for the devtool
 // ignore: prefer_mixin
 class ApplicationState with ChangeNotifier, DiagnosticableTreeMixin {
-  final List<String> _meterList = [];
+  final List<MeterInformation> _meterList = [];
   final List<MeterRecord> _meterRecords = [];
   final String _serverUrl =
       'https://fir-4a8bf-default-rtdb.firebaseio.com/energymeter';
@@ -14,15 +14,15 @@ class ApplicationState with ChangeNotifier, DiagnosticableTreeMixin {
 
   int get count => _count;
   String get backgroundMessage => _backgroundMessage;
-  List<String> get meterList => _meterList;
+  List<MeterInformation> get meterList => _meterList;
 
   void resetMeterList() {
     _meterList.clear();
     notifyListeners();
   }
 
-  void addMeterToMeterList(String meter) {
-    _meterList.add(meter);
+  void addMeterToMeterList(String meter, String description) {
+    _meterList.add(MeterInformation(id: meter, description: description));
     notifyListeners();
   }
 

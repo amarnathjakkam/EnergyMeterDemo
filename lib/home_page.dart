@@ -41,7 +41,7 @@ class _HomePageState extends State<HomePage> {
       });
       try {
         String url = context.read<ApplicationState>().getUrl();
-        url += "/meters.json?shallow=true";
+        url += "/demo/info/meter.json";
         // print("url $url");
         Response response = await http.get(
           Uri.parse(url),
@@ -51,12 +51,16 @@ class _HomePageState extends State<HomePage> {
         );
         if (response.statusCode >= 200 && response.statusCode < 300) {
           Map<String, dynamic> parameters = jsonDecode(response.body);
-          // print('parameters $parameters');
+          if (kDebugMode) {
+            print('parameters $parameters');
+          }
           if (!mounted) return;
           context.read<ApplicationState>().resetMeterList();
           parameters.forEach((key, value) {
             // print("Key $key value $value");
-            context.read<ApplicationState>().addMeterToMeterList(key);
+            context
+                .read<ApplicationState>()
+                .addMeterToMeterList(value["id"], value["description"]);
           });
           if (kDebugMode) {
             print("Meter List ${context.read<ApplicationState>().meterList}");
@@ -78,7 +82,11 @@ class _HomePageState extends State<HomePage> {
         context,
         MaterialPageRoute(
             builder: (_) => MeterLiveWidget(
-                meterImei: context.read<ApplicationState>().meterList[index])));
+                meterImei: context.read<ApplicationState>().meterList[index].id,
+                meterLocation: context
+                    .read<ApplicationState>()
+                    .meterList[index]
+                    .description)));
   }
 
   @override
@@ -152,10 +160,18 @@ class _HomePageState extends State<HomePage> {
                 leading: Icon(Icons.gas_meter,
                     color: Colors.blue.shade600, size: 45),
                 title: Text(
-                  context.read<ApplicationState>().meterList.elementAt(index),
+                  context
+                      .read<ApplicationState>()
+                      .meterList
+                      .elementAt(index)
+                      .description,
                   style: const TextStyle(fontSize: 20),
                 ),
-                subtitle: const Text(''),
+                subtitle: Text(context
+                    .read<ApplicationState>()
+                    .meterList
+                    .elementAt(index)
+                    .id),
               ),
             )));
   }
